@@ -7,7 +7,8 @@ sudo apt install zsh
 
 Install antigen - 
 ```
-curl -L git.io/antigen > antigen.zsh
+mkdir -p $HOME/.antigen
+curl -L git.io/antigen > .antigen/antigen.zsh
 ```
 
 Copy sample .zshrc

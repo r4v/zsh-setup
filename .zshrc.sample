@@ -1,4 +1,4 @@
-ZSH_THEME="af-magic2"
+ZSH_THEME="af-magic-r4ven"
 # disable flow control for that terminal (CTRL+s for vim)
 stty -ixon
 
