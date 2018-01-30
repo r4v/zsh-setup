@@ -1,0 +1,251 @@
+ZSH_THEME="af-magic2"
+# disable flow control for that terminal (CTRL+s for vim)
+stty -ixon
+
+# Uncomment following line if you want to disable marking untracked files under
+# VCS as dirty. This makes repository status check for large repositories much,
+# much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment following line if you want to  shown in the command execution time stamp
+# in the history command output. The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|
+# yyyy-mm-dd
+# HIST_STAMPS="mm/dd/yyyy"
+
+#HISTSIZE=2000
+#SAVEHIST=2000
+#HISTFILE=~/.history
+
+export HISTSIZE=100000
+export SAVEHIST=100000
+export COMPLETION_WAITING_DOTS="true"
+export HISTFILE=~/.zhistory
+setopt INC_APPEND_HISTORY
+setopt EXTENDED_HISTORY 
+
+
+autoload -Uz compinit; compinit
+autoload -U zmv
+
+# ### Activate colored completion:
+which dircolors >/dev/null && eval "$(dircolors -b)"
+zstyle ':completion:*:default' menu select=2 list-colors ${(s.:.)LS_COLORS}
+
+
+########################################################################
+#				 
+#								  antigen
+#
+########################################################################
+source ~/.antigen/antigen.zsh
+
+# Load the oh-my-zsh's library.
+antigen use oh-my-zsh
+
+antigen bundle git
+antigen bundle composer
+antigen bundle httpie
+antigen bundle sudo
+antigen bundle systemd
+antigen bundle extract
+
+antigen bundle akoenig/npm-run.plugin.zsh
+antigen bundle command-not-found
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-completions
+antigen bundle chrissicool/zsh-256color
+antigen bundle tomsquest/nvm-auto-use.zsh
+antigen theme https://gist.github.com/r4v/5a044618a0bc016f5c88b4c0d781026f af-magic-r4ven
+
+export NVM_LAZY_LOAD=true
+antigen bundle lukechilds/zsh-nvm
+
+antigen apply
+#antigen cache-gen
+
+ZSH_AUTOSUGGEST_USE_ASYNC="true"
+
+
+#########################################################################
+#																		#
+#########################################################################
+export EDITOR=/usr/bin/vim.nox
+export GREP_COLOR=32
+
+
+export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+export ARCHFLAGS="-arch x86_64"
+
+#
+#cdpath=(~ ~/projekty ~/sdb/inovatica )
+
+alias ls='ls -Alho --color=auto'
+alias df='dfc -T -t -tmpfs,-rootfs -w -n'
+alias list_volumes='lsblk --fs'
+alias phpsrv="php -S 0.0.0.0:8000"
+alias tinker="php artisan tinker"
+alias artisan="./artisan"
+alias full-netstat="sudo netstat -vaWlptue"
+
+alias pull="git pull"
+alias gitforcepull="git fetch --all && git reset --hard origin/master"
+alias gitlog='git log --graph --date-order -C -M --pretty=format:"%C(yellow)%h%C(reset) - %C(bold green)%ad%C(reset) - %C(dim yellow)%an%C(reset) %C(bold red)>%C(reset) %C(white)%s%C(reset) %C(bold red)%d%C(reset) " --abbrev-commit --date=short'
+
+alias pythonserver='python -m SimpleHTTPServer'
+alias update='sudo apt update && sudo apt upgrade'
+alias wgetmirror='wget -np -km -E -e robots=off --page-requisites'
+alias checkdns='dig +short which.opendns.com txt @208.67.220.220'
+alias genpasswd="cat /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1"
+
+
+# draw red line
+hr() {
+    RESTORE='\033[0m'
+    RED='\033[00;31m'
+    echo -e "${RED}"
+    printf '━%.0s' $(seq $COLUMNS)
+    echo -e "${RESTORE}"
+}
+
+# Shortcuts
+tarbz() {
+    tar -cf "$1".tar.bz2 --use-compress-prog=/usr/bin/pbzip2 "$1"
+}
+
+untarbz() {
+    /usr/bin/pbzip2 -dc "$1" | tar x --exclude="._*"
+}
+
+
+
+# colorful manpages in less
+export LESS_TERMCAP_mb=$'\e[1;35m'
+export LESS_TERMCAP_md=$'\e[1;34m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[1;30m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[1;4;38m'
+export GROFF_NO_SGR=1
+export LESS='-R'
+export LESSOPEN='|~/.lessfilter %s'
+
+
+if [ "$TERM" = "xterm" ] ; then
+    if [ -z "$COLORTERM" ] ; then
+        if [ -z "$XTERM_VERSION" ] ; then
+            echo "Warning: Terminal wrongly calling itself 'xterm'."
+        else
+            case "$XTERM_VERSION" in
+            "XTerm(256)") TERM="xterm-256color" ;;
+            "XTerm(88)") TERM="xterm-88color" ;;
+            "XTerm") ;;
+            *)
+                echo "Warning: Unrecognized XTERM_VERSION: $XTERM_VERSION"
+                ;;
+            esac
+        fi
+    else
+        case "$COLORTERM" in
+            gnome-terminal)
+                # Those crafty Gnome folks require you to check COLORTERM,
+                # but don't allow you to just *favor* the setting over TERM.
+                # Instead you need to compare it and perform some guesses
+                # based upon the value. This is, perhaps, too simplistic.
+                TERM="gnome-256color"
+                ;;
+            *)
+                echo "Warning: Unrecognized COLORTERM: $COLORTERM"
+                ;;
+        esac
+    fi
+fi
+
+SCREEN_COLORS="`tput colors`"
+if [ -z "$SCREEN_COLORS" ] ; then
+    case "$TERM" in
+        screen-*color-bce)
+            echo "Unknown terminal $TERM. Falling back to 'screen-bce'."
+            export TERM=screen-bce
+            ;;
+        *-88color)
+            echo "Unknown terminal $TERM. Falling back to 'xterm-88color'."
+            export TERM=xterm-88color
+            ;;
+        *-256color)
+            echo "Unknown terminal $TERM. Falling back to 'xterm-256color'."
+            export TERM=xterm-256color
+            ;;
+    esac
+    SCREEN_COLORS=`tput colors`
+fi
+if [ -z "$SCREEN_COLORS" ] ; then
+    case "$TERM" in
+        gnome*|xterm*|konsole*|aterm|[Ee]term)
+            echo "Unknown terminal $TERM. Falling back to 'xterm'."
+            export TERM=xterm
+            ;;
+        rxvt*)
+            echo "Unknown terminal $TERM. Falling back to 'rxvt'."
+            export TERM=rxvt
+            ;;
+        screen*)
+            echo "Unknown terminal $TERM. Falling back to 'screen'."
+            export TERM=screen
+            ;;
+    esac
+    SCREEN_COLORS=`tput colors`
+fi
+
+
+###-begin-npm-completion-###
+#
+# npm command completion script
+#
+# Installation: npm completion >> ~/.bashrc  (or ~/.zshrc)
+# Or, maybe: npm completion > /usr/local/etc/bash_completion.d/npm
+#
+		COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
+		COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
+		export COMP_WORDBREAKS
+		if type complete &>/dev/null; then
+		  _npm_completion () {
+		    local si="$IFS"
+		    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
+		                           COMP_LINE="$COMP_LINE" \
+		                           COMP_POINT="$COMP_POINT" \
+		                           npm completion -- "${COMP_WORDS[@]}" \
+		                           2>/dev/null)) || return $?
+		    IFS="$si"
+		  }
+		  complete -F _npm_completion npm
+		elif type compdef &>/dev/null; then
+		  _npm_completion() {
+		    si=$IFS
+		    compadd -- $(COMP_CWORD=$((CURRENT-1)) \
+		                 COMP_LINE=$BUFFER \
+		                 COMP_POINT=0 \
+		                 npm completion -- "${words[@]}" \
+		                 2>/dev/null)
+		    IFS=$si
+		  }
+		  compdef _npm_completion npm
+		elif type compctl &>/dev/null; then
+		  _npm_completion () {
+		    local cword line point words si
+		    read -Ac words
+		    read -cn cword
+		    let cword-=1
+		    read -l line
+		    read -ln point
+		    si="$IFS"
+		    IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+		                       COMP_LINE="$line" \
+		                       COMP_POINT="$point" \
+		                       npm completion -- "${words[@]}" \
+		                       2>/dev/null)) || return $?
+		    IFS="$si"
+		  }
+		  compctl -K _npm_completion npm
+		fi
+###-end-npm-completion-###
