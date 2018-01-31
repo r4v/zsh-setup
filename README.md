@@ -22,5 +22,3 @@ sudo chsh -s /usr/bin/zsh username
 ```
 
 Spawn new shell and... voilà
-
-![Ivegotthepower](https://media.giphy.com/media/A9grgCQ0Dm012/giphy.gif)
